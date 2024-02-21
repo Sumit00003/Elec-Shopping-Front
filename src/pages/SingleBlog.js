@@ -1,15 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Breadcrumb from '../components/breadcrumb'
 import Meta from '../components/Meta'
-import {Link} from 'react-router-dom'
+import {Link, useLocation} from 'react-router-dom'
 import { FaArrowLeft } from "react-icons/fa";
 import blog from '../images/blog-1.jpg'
 import Container from '../components/Container';
+import { useDispatch, useSelector } from 'react-redux'
+import { getAblog } from '../features/blogs/blogsSlice';
+
+
+
 const SingleBlog = () => {
+  const blogAState = useSelector((state)=>state?.blog?.singleblog);
+  console.log(blogAState)
+  const location = useLocation();
+  // console.log(location)
+  const getBlogId = location.pathname.split('/')[2];
+  const dispatch = useDispatch();
+  useEffect(() =>{
+      getABlog();
+  },[])
+  const getABlog = () =>{
+     dispatch(getAblog(getBlogId));
+  }
+
   return (
     <>
-     <Meta title={"Dynamic Blog Name"} />
-   <Breadcrumb title='Dynamic Blog Name' />
+     <Meta title={blogAState?.title} />
+   <Breadcrumb title={blogAState?.title} />
    <Container class1='blog-wrapper home-wrapper-2 py-5'>
       <div className='row'>
           <div className='col-12'>
@@ -17,10 +35,10 @@ const SingleBlog = () => {
             Go Back to Blog</Link>
             <div className='single-blog-card'>
                 <h3 className='title'>
-                    A beautiful sunday morning renaissance
+                {blogAState?.title}
                 </h3>
-                <img src={blog} alt='blog' />
-                <p>Description</p>
+                <img src={blogAState?.images[0] ? blogAState?.images[0] : blog} alt='blog' />
+                <p dangerouslySetInnerHTML={{__html: blogAState?.description}}></p>
 
             </div>
         </div>

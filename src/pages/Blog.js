@@ -1,10 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Breadcrumb from '../components/breadcrumb'
 import Meta from '../components/Meta'
 import BlogCart from '../components/BlogCart'
 import Container from '../components/Container'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAllblogs } from '../features/blogs/blogsSlice'
+import moment from"moment";
 
 const Blog = () => {
+  const blogState = useSelector((state)=>state.blog.blog)
+  const dispatch = useDispatch();
+  useEffect(() =>{
+      getBlogs();
+  },[])
+  const getBlogs = () =>{
+     dispatch(getAllblogs());
+  }
+
+
   return (
     <>
     <Meta title={"Blogs"} />
@@ -26,18 +39,21 @@ const Blog = () => {
           </div>
           <div className='col-9'>
             <div className='row'>
-              <div className='col-6 mb-3'>
-              <BlogCart />
+              { blogState && blogState.map && 
+                blogState?.map((item , index ) => {
+                  return (
+                    <div className='col-6 mb-3' key={index}>
+              <BlogCart id={item?._id} 
+              title={item?.title} 
+              description={item?.description} 
+              image={item?.images[0]} 
+              date ={moment(item?.createdAt).format("MMMM Do YYYY, h:mm:ss a")}
+              />
             </div>
-            <div className='col-6 mb-3'>
-              <BlogCart />
-            </div>
-            <div className='col-6 mb-3'>
-              <BlogCart />
-            </div>
-            <div className='col-6 mb-3'>
-              <BlogCart />
-            </div>
+                  )
+                })
+              }
+              
               </div>
               
           </div>

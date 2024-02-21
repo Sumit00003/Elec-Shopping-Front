@@ -1,21 +1,62 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Breadcrumb from '../components/breadcrumb'
 import Meta from '../components/Meta'
 import ProductCart from '../components/ProductCart'
 import ReactStars from 'react-rating-stars-component'
 import ReactImageZoom from 'react-image-zoom';
 import Color from '../components/Color'
-import Link from 'react-router-dom'
+//import Link from 'react-router-dom'
 import { IoGitCompareOutline } from "react-icons/io5";
-import { FaCartPlus } from "react-icons/fa";
+import { FaCartPlus, FaLiraSign } from "react-icons/fa";
 import Container from '../components/Container'
+import { useLoaderData, useLocation, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { getAproducts } from '../features/product/productSlice'
+import {toast} from 'react-toastify'
+import {addProdToCart, getUserCart} from '../features/user/UserSlice'
+
 const SingleProduct = () => {
+  const [color , setColor] = useState(null)
+  const [quantity , setQuantity] = useState(1)
+  const [alreadyAdded , setAlreadyAdded] = useState(false)
+  const location = useLocation();
+  const getProductId = location.pathname.split("/")[2]
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const productState = useSelector((state) => state.product.singleproduct)
+  const cartState = useSelector((state) => state.auth.cartProduct)
+  // console.log(cartState)
+
+  useEffect(()=>{
+    dispatch(getAproducts(getProductId))
+    dispatch(getUserCart())
+}, [])
+
+useEffect(()=>{
+  for (let i = 0 ; i <cartState?.length ; i++){
+    if (getProductId === cartState[i]?.productId?._id){
+      setAlreadyAdded(true)
+    }
+  }
+}, [])
+
+const uploadCart = () => {
+if(color===null){
+  toast.error("Please Choose Color.")
+  return false
+} else{
+  dispatch(addProdToCart({productId:productState?._id , quantity, color , price:productState?.price}))
+  navigate('/cart')
+}
+}
+
   const props = { 
     width: 400,
    height: 500, 
    zoomWidth: 600, 
-   img: "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg"} ;
-  const [orderedProduct, setorderedProduct] = useState(true);
+   img: productState?.images[0].url ? productState?.images[0].url : "https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg"
+  } ;
+  const [orderedProduct /*setorderedProduct*/] = useState(true);
   const copyToClipboard = (text) => {
     console.log('text', text)
     var textField = document.createElement('textarea')
@@ -38,23 +79,30 @@ const SingleProduct = () => {
                 </div>
               </div>
               <div className='other-product-images d-flex flex-wrap gap-15'>
+                { productState?.images &&  productState?.images.map &&
+                  productState?.images.map((item, index) => {
+                    return (
+                      <div><img src={item?.url } className='img-fluid' alt='item' /></div>
+                    )
+                  })
+                }
+                {/* <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div>
                 <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div>
                 <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div>
-                <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div>
-                <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div>
+                <div><img src='https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg' className='img-fluid' alt='' /></div> */}
               </div>
             </div>
             <div className='col-6'>
               <div className='main-product-details'>
                 <div className='border-bottom'>
                   <h3 className='title'>
-                    Kids Headphones Bulk 10 Pack Multi Colored For Students
+                    {productState?.title}
                   </h3>
                 </div>
                 <div className='border-bottom py-3'>
-                  <p className='price'>$ 100.00</p>
+                  <p className='price'>$ {productState?.price}</p>
                   <div className='d-flex align-items-center gap-10'>
-                  <ReactStars count={5} size={24} value="3" edit={false} activeColor="#ffd700" />
+                  <ReactStars count={5} size={24} value={productState?.totalratings} edit={false} activeColor="#ffd700" />
                       <p className='mb-0 t-review'>2 Reviews</p>
                   </div>
                   <a href='#review'>Write a Review</a>
@@ -66,11 +114,11 @@ const SingleProduct = () => {
                   </div>
                   <div className='d-flex gap-10 align-items-center'>
                     <h3 className='product-heading'>Brand :</h3>
-                    <p className='product-data my-2'>Havels</p>
+                    <p className='product-data my-2'>{productState?.brand}</p>
                   </div>
                   <div className='d-flex gap-10 align-items-center'>
                     <h3 className='product-heading'>Category :</h3>
-                    <p className='product-data my-2'>Watch</p>
+                    <p className='product-data my-2'>{productState?.category}</p>
                   </div>
                   <div className='d-flex gap-10 align-items-center'>
                     <h3 className='product-heading'>Tags :</h3>
@@ -89,26 +137,43 @@ const SingleProduct = () => {
                       <span className='badge border border-1 bg-white text-dark border-secondary'>XL</span>
                     </div>
                   </div>
-                  <div className='d-flex gap-10 flex-column mt-2 mb-3'>
+                  {
+                    alreadyAdded === false && <>
+                     <div className='d-flex gap-10 flex-column mt-2 mb-3'>
                     <h3 className='product-heading'>Color :</h3>
-                    <Color />
+                    <Color setColor={setColor} colorData={productState?.color} />
                   </div>
+                    </>
+                  }
                   <div className='d-flex align-items-center gap-15 flex-row mt-2 mb-3'>
-                    <h3 className='product-heading'>Quantity :</h3>
+                    {
+                      alreadyAdded === false && <>
+                      <h3 className='product-heading'>Quantity :</h3>
                     <div>
-                      <input type='number' name='' id='' min={1} max={10} className='form-control' style={{ width : "70px"}} />
+                      <input type='number' name='' id='' min={1} max={10} className='form-control' style={{ width : "70px"}} onChange={(e) => setQuantity(e.target.value)} value={quantity} />
                     </div>
-                    <div className='d-flex align-items-center gap-30 ms-5'>
-                    <button className='button border-0' type='submit'>Add to Cart</button>
-                    <button to='/signup' className='button signup '>Buy it Now</button>
+                      </>
+                    }
+
+                    <div className={alreadyAdded?"ms-0" : "ms-5" + 'd-flex align-items-center gap-30 ms-5'}>
+                    <button 
+                    className='button border-0' 
+                    type='button'
+                    // data-toggle="modal"
+                    // data-target="#staticBackdrop"
+                    onClick={()=>{alreadyAdded ? navigate('/cart') : uploadCart()}}>
+                    {alreadyAdded?"Go to Cart" : "Add to Cart"}
+                      </button>
+
+                    {/* <button to='/signup' className='button signup '>Buy it Now</button> */}
                     </div>
                   </div>
                   <div className='d-flex align-items-center gap-15'>
                     <div>
-                      <a href=''><IoGitCompareOutline className='fs-5 mb-2'/> Add to Compare</a>
+                      <a href='/compare'><IoGitCompareOutline className='fs-5 mb-2'/> Add to Compare</a>
                     </div>
                     <div>
-                      <a href=''><FaCartPlus className='fs-5 mb-2'/> Add to Wishlist</a>
+                      <a href='/wishlist'><FaCartPlus className='fs-5 mb-2'/> Add to Wishlist</a>
                     </div>
                   </div>
                   <div className='d-flex gap-10 flex-column my-3'>
@@ -120,7 +185,8 @@ const SingleProduct = () => {
                   </div>
                   <div className='d-flex gap-10 align-items-center my-3'>
                     <h3 className='product-heading'>Product Link</h3>
-                    <a href='javascript:void(0);' onClick={() => {copyToClipboard("https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?cs=srgb&dl=wood-wristwatch-time-190819.jpg&fm=jpg")
+                    <a href='javascript:void(0);' onClick={() => {copyToClipboard
+                    (window.location.href)
                     }} >Copy Product link From here</a>
                     
                   </div>
@@ -135,7 +201,7 @@ const SingleProduct = () => {
           <h4>Description</h4>
             <div className='col-12'>
              <div>
-                <p>Description</p>
+                <p dangerouslySetInnerHTML={{__html: productState?.description}}></p>
               </div>
             </div>
           </div>
@@ -156,7 +222,7 @@ const SingleProduct = () => {
                   </div>
                   {orderedProduct && (
                     <div>
-                      <a className='text-dark text-decoration-underline' href="">Write a Review</a>
+                      <a className='text-dark text-decoration-underline' href="#">Write a Review</a>
                     </div>
                   )}
                 </div>

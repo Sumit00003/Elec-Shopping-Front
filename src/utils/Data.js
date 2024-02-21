@@ -1,4 +1,4 @@
-// // import service from '../images'
+ // import service from '../images'
 // export const Services =[{
 //     title:"Free Shipping",
 //     tagline:"From all orders over $5",
@@ -6,7 +6,7 @@
 // },{
 //     title:"Daily Surprise Offer",
 //     tagline:"Save upto 25% off",
-//     image:"C:\Users\Admin\Desktop\ecommerce-app\src\images\service.png"
+//     image:""
 // },{
 
 //     title:"Support 24/7",
