@@ -25,6 +25,7 @@ import Checkout from './pages/Checkout';
 import { PrivateRoutes } from './routing/privaterouting';
 import { OpenRoutes } from './routing/openroute';
 import Orders from './pages/Orders';
+import Profile from './pages/Profile';
 
 
 
@@ -42,13 +43,14 @@ function App() {
         <Route path="blog/:id" element={<SingleBlog />}/>
         <Route path="cart" element={<PrivateRoutes><Cart /></PrivateRoutes>}/>
         <Route path="my-orders" element={<PrivateRoutes><Orders /></PrivateRoutes>}/>
+        <Route path="my-profile" element={<PrivateRoutes><Profile /></PrivateRoutes>}/>
         <Route path="checkout" element={<PrivateRoutes><Checkout /></PrivateRoutes>}/>
         <Route path="compare-products" element={<CompareProd />}/>
         <Route path="wishlist" element={<PrivateRoutes><Wishlist /></PrivateRoutes>}/>
         <Route path="login" element={<LoginPage />}/>
         <Route path="forgot-password" element={<ForgotPassword />}/>
-        <Route path="signup" element={<OpenRoutes><Signup /></OpenRoutes>}/>
-        <Route path="reset-password" element={<ResetPassword />}/>
+        <Route path="sign-up" element={<OpenRoutes><Signup /></OpenRoutes>}/>
+        <Route path="reset-password/:token" element={<ResetPassword />}/>
         <Route path="privacy-policy" element={<PrivacyPolicy />}/>
         <Route path="refund-policy" element={<RefundPolicy />}/>
         <Route path="shipping-policy" element={<ShippingPolicy />}/>
