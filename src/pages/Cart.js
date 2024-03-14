@@ -11,33 +11,46 @@ import { deleteCartPRoduct, getUserCart, upadateCartPRoduct } from '../features/
 
 
 
-const Cart = () => {
+const Cart =  () => {
+    const getTokenFromLocalStorage = localStorage.getItem("customer")
+    ? JSON.parse(localStorage.getItem("customer"))
+    : null;
+  
+   const config2 = {
+    headers: {
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+      }`,
+      Accept: "application/json",
+    },
+   
+  };
     
-    const userCartState = useSelector(state => state.auth.cartProduct)
+    const userCartState = useSelector(state => state?.auth?.cartProduct)
     //const userCartState = useSelector(state => state.auth.cartProduct.ProductId)
     const [productUpdateDetail, setproductUpdateDetail] = useState(null)
     const [totalAmount, settotalAmount] = useState(null)
-    console.log(totalAmount)
+    // console.log(totalAmount)
     // console.log(productUpdateDetail)
     //console.log(userCartState)
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(getUserCart())
+     useEffect(() => {
+        dispatch(getUserCart(config2))
     }, [])
     useEffect(() => {
         if(productUpdateDetail !== null){
             dispatch(upadateCartPRoduct({ cartItemId: productUpdateDetail?.cartItemId, quantity:productUpdateDetail?.quantity }))
         setTimeout(() => {
-            dispatch(getUserCart())
+            dispatch(getUserCart(config2))
         }, 200)
         }
     }, [productUpdateDetail])
 
     const deleteaCartProduct = (id) => {
-        dispatch(deleteCartPRoduct(id))
+        dispatch(deleteCartPRoduct({id:id , config2:config2}))
         setTimeout(() => {
-            dispatch(getUserCart())
+            dispatch(getUserCart(config2))
         }, 200)
     }
     useEffect(() =>{
@@ -68,7 +81,7 @@ const Cart = () => {
                                     <div key={index} className='cart-data py-3 mb-2 justify-content-between d-flex align-items-center'>
                                         <div className='cart-col-1 gap-15 d-flex align-items-center'>
                                             <div className='w-25'>
-                                                <img src={item?.images ? item?.images : watch} className='img-fluid' alt='watch' />
+                                                <img src={item?.productId?.images[0]?.url ?item?.productId?.images[0]?.url : watch} className='img-fluid' alt='watch' />
                                             </div>
                                             <div className='w-75'>
                                                 <h5 >{item?.productId.title}</h5>
@@ -83,8 +96,11 @@ const Cart = () => {
                                         </div>
                                         <div className='cart-col-3 d-flex align-items-center gap-15'>
                                             <div>
-                                                <input className='form-control' type='number' min={1} max={10} name='' id='' 
-                                                value={productUpdateDetail?.quantity ? productUpdateDetail?.quantity : item?.quantity} 
+                                                <input className='form-control' 
+                                                type='number' min={1} max={10} 
+                                                name={"quantity"+item?._id} 
+                                                id={"cart"+item?._id} 
+                                                value={item?.quantity} 
                                                 onChange={(e) => { setproductUpdateDetail({cartItemId:item?._id ,quantity:e.target.value})}} />
                                             </div>
                                             <div>

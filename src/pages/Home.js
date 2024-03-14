@@ -4,6 +4,7 @@ import Marquee from 'react-fast-marquee'
 import BlogCart from '../components/BlogCart'
 import Specialprod from '../components/specialprod'
 import ProductCart from '../components/ProductCart'
+import { FaRupeeSign } from "react-icons/fa";
 import catbanner from '../images/catbanner-01.jpg'
 import catbanner2 from '../images/catbanner-02.jpg'
 import catbanner3 from '../images/catbanner-03.jpg'
@@ -73,7 +74,7 @@ const Home = () => {
               <div className='main-banner-content position-absolute'>
                 <h4>SuperCharged For PROS.</h4>
                 <h5>iPad S13+ Pro</h5>
-                <p>From $999 or $41.62/mo.</p>
+                <p>From <FaRupeeSign />999 or <FaRupeeSign />41.62/mo.</p>
                 <Link className='button'>Buy Now</Link>
               </div>
             </div>
@@ -85,7 +86,7 @@ const Home = () => {
                 <div className='small-banner-content position-absolute'>
                   <h4>Best Sales</h4>
                   <h5>iPad S13+ Pro</h5>
-                  <p>From $999 <br />or $41.62/mo.</p>
+                  <p>From <FaRupeeSign />999 <br />or <FaRupeeSign />41.62/mo.</p>
                 </div>
               </div>
               <div className='small-banner position-relative'>
@@ -93,7 +94,7 @@ const Home = () => {
                 <div className='small-banner-content position-absolute'>
                   <h4>New Arrival</h4>
                   <h5>Buy Ipad Air</h5>
-                  <p>From $999 <br />or $41.62/mo.</p>
+                  <p>From <FaRupeeSign />999 <br />or <FaRupeeSign />41.62/mo.</p>
                 </div>
               </div>
               <div className='small-banner position-relative'>
@@ -101,7 +102,7 @@ const Home = () => {
                 <div className='small-banner-content position-absolute'>
                   <h4>New Arrival</h4>
                   <h5>Buy Ipad Air</h5>
-                  <p>From $999 <br />or $41.62/mo.</p>
+                  <p>From <FaRupeeSign />999 <br />or <FaRupeeSign />41.62/mo.</p>
                 </div>
               </div>
               <div className='small-banner position-relative'>
@@ -109,7 +110,7 @@ const Home = () => {
                 <div className='small-banner-content position-absolute'>
                   <h4>New Arrival</h4>
                   <h5>Buy Ipad Air</h5>
-                  <p>From $999 <br />or $41.62/mo.</p>
+                  <p>From <FaRupeeSign />999 <br />or <FaRupeeSign />41.62/mo.</p>
                 </div>
               </div>
             </div>
@@ -124,7 +125,7 @@ const Home = () => {
                 <img src={service} alt='services' />
                 <div>
                   <h6>Free Shipping</h6>
-                  <p className='mb-0'>From all orders over $5
+                  <p className='mb-0'>From all orders over <FaRupeeSign />5
                   </p>
                 </div>
               </div>
@@ -164,7 +165,7 @@ const Home = () => {
           </div>
         </div>
       </Container>
-      <Container class1='home-wrapper-2 py-5'>
+      {/* <Container class1='home-wrapper-2 py-5'>
         <div className='row'>
           <div className='col-12'>
             <div className='categories d-flex justify-content-between flex-wrap align-items-center'>
@@ -227,7 +228,7 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </Container>
+      </Container> */}
       <Container class1='featured-wrapper py-5 home-wrapper-2'>
         <div className='row'>
           <div className='col-12'>
@@ -264,20 +265,20 @@ const Home = () => {
                          <ReactStars count={5} size={24}  value={item?.totalrating.toString()} edit={false} activeColor="#ffd700" />
                          
                          <p className='price'>
-                             <span className='red-p'>${item.price}</span> &nbsp; <strike>$675</strike>
+                             <span className='red-p'><FaRupeeSign />{item.price}</span>
                          </p> 
                  </div>
                  <div className='action-bar position-absolute'>
                      <div className='d-flex flex-column gap-15'>
-                     <button className='border-0 bg-transparent'>
+                     {/* <button className='border-0 bg-transparent'>
                          <img src={compare} alt='compare' />
-                         </button>
+                         </button> */}
                          <button className='border-0 bg-transparent'>
                          <img onClick={() => {navigate("/product/" + item?._id)}} src={view} alt='view' />
                          </button>
-                         <button className='border-0 bg-transparent'>
+                         {/* <button className='border-0 bg-transparent'>
                          <img src={addcart} alt='addcart' />
-                         </button>
+                         </button> */}
                      </div>
                  </div>
              </div>
@@ -294,7 +295,7 @@ const Home = () => {
               <div className='famous-content position-absolute'>
                 <h5>Big Screen</h5>
                 <h6>Smart Watch Series 7</h6>
-                <p>From $339 or $16.62/mo for 24 mo.</p>
+                <p>From <FaRupeeSign />339 or <FaRupeeSign />16.62/mo for 24 mo.</p>
               </div>
             </div>
           </div>
@@ -314,7 +315,7 @@ const Home = () => {
               <div className='famous-content position-absolute'>
                 <h5 className='text-dark'>SmartPhones</h5>
                 <h6 className='text-dark'><b>Smart Phone 13 Pro</b></h6>
-                <p className='text-dark'>Now in Green. from $999.00 or $41.62/mo, for 24 mo. Footnote*</p>
+                <p className='text-dark'>Now in Green. from <FaRupeeSign />999.00 or <FaRupeeSign />41.62/mo, for 24 mo. Footnote*</p>
               </div>
             </div>
           </div>
@@ -324,7 +325,7 @@ const Home = () => {
               <div className='famous-content position-absolute'>
                 <h5 className='text-dark'>Home Speakers </h5>
                 <h6 className='text-dark'><b>Room-filling Sound</b></h6>
-                <p className='text-dark'>From $699 or $116.58/mo. for 12 mo.*</p>
+                <p className='text-dark'>From <FaRupeeSign />699 or <FaRupeeSign />116.58/mo. for 12 mo.*</p>
               </div>
             </div>
           </div>
@@ -394,20 +395,20 @@ const Home = () => {
                          <ReactStars count={5} size={24}  value={item?.totalrating.toString()} edit={false} activeColor="#ffd700" />
                          
                          <p className='price'>
-                             <span className='red-p'>${item.price}</span> &nbsp; <strike>$675</strike>
+                             <span className='red-p'><FaRupeeSign />{item.price}</span> &nbsp; <strike>$675</strike>
                          </p> 
                  </div>
                  <div className='action-bar position-absolute'>
                      <div className='d-flex flex-column gap-15'>
-                     <button className='border-0 bg-transparent'>
+                     {/* <button className='border-0 bg-transparent'>
                          <img src={compare} alt='compare' />
-                         </button>
+                         </button> */}
                          <button className='border-0 bg-transparent'>
                          <img onClick={()=>{navigate("/product/" + item?._id)}} src={view} alt='view' />
                          </button>
-                         <button className='border-0 bg-transparent'>
+                         {/* <button className='border-0 bg-transparent'>
                          <img src={addcart} alt='addcart' />
-                         </button>
+                         </button> */}
                      </div>
                  </div>
              </div>

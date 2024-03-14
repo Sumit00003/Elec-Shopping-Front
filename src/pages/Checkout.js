@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Await, Link, json, useNavigate } from 'react-router-dom'
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import watch from '../images/watch.jpg'
 import Container from '../components/Container';
@@ -8,7 +8,8 @@ import * as yup from 'yup'
 import {useFormik} from "formik"
 import axios from "axios"
 import {config} from '../utils/axiosConfig'
-import { createAorder } from '../features/user/UserSlice';
+import { FaRupeeSign } from "react-icons/fa";
+import { EmptyUserCart, createAorder, getUserCart, resetState } from '../features/user/UserSlice';
 
 const shippingSchema = yup.object({
     firstname: yup.string().required("First Name is Required"),
@@ -22,10 +23,14 @@ const shippingSchema = yup.object({
 
 const Checkout = () => {
     const dispatch = useDispatch();
-    const cartState = useSelector(state => state.auth.cartProduct)
+    const navigate = useNavigate()
+    const cartState = useSelector(state => state?.auth?.cartProduct)
+    const authState = useSelector(state => state?.auth)
     const [totalAmount, settotalAmount] = useState(null)
     const [shippingInfo , setshippingInfo] =useState(null);
-    const [paymentInfo , setpaymentInfo] = useState({razorpayPaymentId:"", razorpayOrderId:""})
+    // console.log(shippingInfo)
+    // const [paymentInfo , setpaymentInfo] = useState({razorpayPaymentId:"", razorpayOrderId:""})
+    // console.log(paymentInfo)
     const [cartProductState, setcartProductState] = useState([])
     // console.log(cartProductState)
     const formik = useFormik({
@@ -40,14 +45,31 @@ const Checkout = () => {
         other:''
         },
         validationSchema : shippingSchema,
-        onSubmit: (values) => {
-            setshippingInfo(values),
+        onSubmit: async (values) => {
+            setshippingInfo(values)
+            localStorage.setItem("address",JSON.stringify(values))
             setTimeout(() => {
                 checkOutHandler()  
             }, 300);
         }
       });
+      console.log(shippingInfo)
 
+      const getTokenFromLocalStorage = localStorage.getItem("customer")
+    ? JSON.parse(localStorage.getItem("customer"))
+    : null;
+  
+   const config2 = {
+    headers: {
+      Authorization: `Bearer ${
+        getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+      }`,
+      Accept: "application/json",
+    },
+  };
+    //   useEffect(()=>{
+    //     dispatch(getUserCart(config2))
+    //   },[])
     useEffect(() =>{
         let sum = 0
         for (let index = 0; index < cartState?.length; index++) {
@@ -55,6 +77,12 @@ const Checkout = () => {
             settotalAmount(sum) 
         }
     },[cartState])
+
+    useEffect(()=>{
+        if(authState?.orderedProduct?.order !== null && authState?.orderedProduct?.success === true){
+            navigate("/my-orders")
+        }
+    },[authState])
     
 const loadScript = (src) => {
     return new Promise((resolve) => {
@@ -85,7 +113,7 @@ const checkOutHandler = async () => {
         alert("Razorpay SDK Failed to Load")
         return
     }
-    const result = await axios.post("http://localhost:5000/api/user/order/checkout",totalAmount,config)
+    const result = await axios.post("http://localhost:5000/api/user/order/checkout",{amount : totalAmount + 5},config)
     if(!result){
         alert("Something went wrong")
         return   
@@ -106,18 +134,13 @@ const checkOutHandler = async () => {
                 razorpayOrderId: response.razorpay_order_id,
                 // razorpaySignature: response.razorpay_signature,
             };
-
             const result = await axios.post("http://localhost:5000/api/user/order/paymentVerification", data , config);
 
-            setpaymentInfo({
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpayOrderId: response.razorpay_order_id,
-            })
-           
-                
-                
-            
-            dispatch(createAorder({totalPrice:totalAmount,totalPriceAfterDiscount:totalAmount,orderItems:cartProductState,shippingInfo}))
+            dispatch(createAorder({totalPrice:totalAmount,totalPriceAfterDiscount:totalAmount,orderItems:cartProductState,shippingInfo:JSON.parse(localStorage.getItem("address")),paymentInfo:result.data}),
+            3000)
+            dispatch(EmptyUserCart(config2))
+            localStorage.removeItem("address")
+            dispatch(resetState())
         },
         prefill: {
             name: "Gada Elec.",
@@ -165,7 +188,7 @@ const checkOutHandler = async () => {
                                         <select name='country' 
                                         value={formik.values.country} 
                                         onChange={formik.handleChange("country")} 
-                                        onBlur={formik.handleChange("country")} 
+                                        onBlur={formik.handleBlur("country")} 
                                         className='form-control form-select'>
                                             <option value='' selected disabled>Select country</option>
                                             <option value='Bharat'>Bharat</option>
@@ -181,7 +204,7 @@ const checkOutHandler = async () => {
                                         name='firstname'
                                         value={formik.values.firstname} 
                                         onChange={formik.handleChange("firstname")} 
-                                        onBlur={formik.handleChange("firstname")} 
+                                        onBlur={formik.handleBlur("firstname")} 
                                          />
                                          <div className='error ms-2 my-1'>
                                             {
@@ -194,7 +217,7 @@ const checkOutHandler = async () => {
                                     name='lastname'
                                     value={formik.values.lastname} 
                                     onChange={formik.handleChange("lastname")} 
-                                    onBlur={formik.handleChange("lastname")} 
+                                    onBlur={formik.handleBlur("lastname")} 
                                      />
                                      <div className='error ms-2 my-1'>
                                         {
@@ -207,7 +230,7 @@ const checkOutHandler = async () => {
                                     name='address'
                                     value={formik.values.address} 
                                     onChange={formik.handleChange("address")} 
-                                    onBlur={formik.handleChange("address")} 
+                                    onBlur={formik.handleBlur("address")} 
                                      />
                                      <div className='error ms-2 my-1'>
                                         {
@@ -220,7 +243,7 @@ const checkOutHandler = async () => {
                                     name='other'
                                     value={formik.values.other} 
                                     onChange={formik.handleChange("other")} 
-                                    onBlur={formik.handleChange("other")} 
+                                    onBlur={formik.handleBlur("other")} 
                                      />
                                      
                                     </div>
@@ -229,7 +252,7 @@ const checkOutHandler = async () => {
                                     name='city'
                                     value={formik.values.city} 
                                     onChange={formik.handleChange("city")} 
-                                    onBlur={formik.handleChange("city")} 
+                                    onBlur={formik.handleBlur("city")} 
                                      />
                                      <div className='error ms-2 my-1'>
                                         {
@@ -242,7 +265,7 @@ const checkOutHandler = async () => {
                                         name='state'
                                         value={formik.values.state} 
                                         onChange={formik.handleChange("state")} 
-                                        onBlur={formik.handleChange("state")} >
+                                        onBlur={formik.handleBlur("state")} >
                                         <option value='' selected disabled>Select State</option>
                                         <option value='Mumbai'>Mumbai</option>
                                     </select>
@@ -257,7 +280,7 @@ const checkOutHandler = async () => {
                                     name='pincode'
                                     value={formik.values.pincode} 
                                     onChange={formik.handleChange("pincode")} 
-                                    onBlur={formik.handleChange("pincode")}/>   
+                                    onBlur={formik.handleBlur("pincode")}/>   
                                     </div>
                                     <div className='error ms-2 my-1'>
                                         {
@@ -292,7 +315,7 @@ const checkOutHandler = async () => {
                                         </div>
                                         </div>
                                         <div className='flex-grow-1'>
-                                            <h5 className='total'>$ {item?.price * item?.quantity}</h5>
+                                            <h5 className='total'><FaRupeeSign />{item?.price * item?.quantity}</h5>
                                         </div>
                                         </div>
 
@@ -304,16 +327,16 @@ const checkOutHandler = async () => {
                         <div className='border-bottom py-4'>
                             <div className='d-flex justify-content-between align-items-center'>
                                 <p className='total'>SubTotal</p>
-                                <p className='total-price'>$ {totalAmount?totalAmount: "0"}</p>
+                                <p className='total-price'><FaRupeeSign />{totalAmount?totalAmount: "0"}</p>
                             </div></div>
                             <div>
                                 <div className='d-flex justify-content-between align-items-center'>
                                 <p className='mb-0 total'>Shipping</p>
-                                <p className='mb-0 total-price'>$ 5</p>
+                                <p className='mb-0 total-price'><FaRupeeSign /> 5</p>
                             </div></div>
                             <div className='d-flex justify-content-between align-items-center border-bottom py-4'>
                                 <h4 className='total'>Total</h4>
-                                <h5 className='total-price'>$ {totalAmount?totalAmount + 5: "0"}</h5>
+                                <h5 className='total-price'><FaRupeeSign /> {totalAmount?totalAmount + 5: "0"}</h5>
                             </div>
                         </div>
                     </div>

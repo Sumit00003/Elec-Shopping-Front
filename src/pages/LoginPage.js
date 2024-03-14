@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux'
 import { loginUser } from '../features/user/UserSlice'
+import { useEffect } from 'react'
 
 const Loginschema = yup.object({
   email: yup.string().email("E-Mail Should be Valid !").required("Email address is Required"),
@@ -15,7 +16,7 @@ const Loginschema = yup.object({
 });
 
 const LoginPage = () => {
-  const authState = useSelector(state => state.auth)
+  const authState = useSelector(state => state?.auth)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const formik = useFormik({
@@ -24,14 +25,15 @@ const LoginPage = () => {
       password: '',
     },
     validationSchema:Loginschema,
-    onSubmit: values => {
-      dispatch(loginUser(values))
-      
-          navigate('/')
-        
+    onSubmit: (values) => {
+      dispatch(loginUser(values))  
     },
   });
-
+useEffect(() => {
+  if(authState.user !== null && authState.isError === false){
+    navigate('/')
+  }
+},[authState])
 
 
   return (
@@ -55,7 +57,7 @@ const LoginPage = () => {
                   }
                 </div>
 
-                <Custominput type='password' name='password' placeholder='Password'
+                <Custominput className="login-password" type='password' name='password' placeholder='Password'
                 value={formik.values.password} onChange={formik.handleChange("password")}
                 onBlur = {formik.handleBlur('password')}
                 />
@@ -68,7 +70,7 @@ const LoginPage = () => {
                   <Link to='/forgot-password'>Forgot your Password ?</Link>
                   <div className='mt-3 d-flex justify-content-center gap-15 align-items-center'>
                     <button className='button border-0' type='submit'>Login</button>
-                    <Link to='/signup' className='button signup '>SignUp</Link>
+                    <Link to='/sign-up' className='button signup '>SignUp</Link>
                   </div>
                 </div>
               </form>
