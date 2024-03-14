@@ -1,6 +1,19 @@
 import axios from 'axios'
-import { base_url, config } from '../../utils/axiosConfig';
+import { base_url } from '../../utils/axiosConfig';
 
+const getTokenFromLocalStorage = localStorage.getItem("customer")
+  ? JSON.parse(localStorage.getItem("customer"))
+  : null;
+
+export const config = {
+  headers: {
+    Authorization: `Bearer ${
+      getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
+    }`,
+    Accept: "application/json",
+  },
+ 
+};
 
 const register = async(userData)=>{
     const response = await axios.post(`${base_url}user/register`,userData);
@@ -30,14 +43,20 @@ const addToCart = async (cartData) => {
         return response.data
     }
 }
-const getCart = async () => {
-    const response = await axios.get(`${base_url}user/cart`,  config);
+const getCart = async (data) => {
+    const response = await axios.get(`${base_url}user/cart`, data, config);
     if (response.data) {
         return response.data
     }
 }
-const removeProdFromCart = async (cartItemId) => {
-    const response = await axios.delete(`${base_url}user/delete-product-cart/${cartItemId}`, config);
+const emptycart = async (data) => {
+    const response = await axios.delete(`${base_url}user/emptycart`,data,config);
+    if (response.data) {
+        return response.data
+    }
+}
+const removeProdFromCart = async (data) => {
+    const response = await axios.delete(`${base_url}user/delete-product-cart/${data.id}`, data.config2);
     if (response.data) {
         return response.data
     }
@@ -60,6 +79,26 @@ const getuserorder = async () => {
         return response.data
     }
 }
+
+const updateUser = async (data) => {
+    const response = await axios.put(`${base_url}user/edit-user`, data.data , data.config2);
+    if (response.data) {
+        return response.data
+    }
+}
+
+const forgotPasswdToken = async (data) => {
+    const response = await axios.post(`${base_url}user/forgot-password-token`, data );
+    if (response.data) {
+        return response.data
+    }
+}
+const resetPasswdToken = async (data) => {
+    const response = await axios.put(`${base_url}user/reset-password/${data.token}`, {password:data?.password});
+    if (response.data) {
+        return response.data
+    }
+}
 export const authService={
     register,
     login,
@@ -68,5 +107,9 @@ export const authService={
     upadateProdFromCart,
     removeProdFromCart,
     createOrder,
-    getuserorder
+    getuserorder,
+    updateUser,
+    forgotPasswdToken,
+    resetPasswdToken,
+    emptycart
 }
